@@ -139,18 +139,16 @@
     yesScale += 0.2;
     yesBtn.style.transform = `scale(${yesScale})`;
     
-    // Get the white card container bounds
-    const cardRect = document.getElementById('questionPage').getBoundingClientRect();
+    // Get container bounds for keeping button inside
+    const containerRect = buttonsContainer.getBoundingClientRect();
     const btnRect = noBtn.getBoundingClientRect();
     
-    // Calculate safe area within the white card (with padding)
-    const padding = 30; // Same as card padding
-    const safeWidth = cardRect.width - (padding * 2) - btnRect.width;
-    const safeHeight = 140; // Height of buttons container
+    // Calculate random position within bounds
+    const maxX = containerRect.width - btnRect.width - 20;
+    const maxY = containerRect.height - btnRect.height - 20;
     
-    // Random position within safe area
-    const x = Math.random() * Math.max(0, safeWidth - 40);
-    const y = Math.random() * Math.max(0, safeHeight - btnRect.height - 20);
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
     
     // Apply smooth transform
     noBtn.style.transform = `translate(${x}px, ${y}px) scale(${noScale})`;
@@ -174,84 +172,8 @@
         <p style="font-size: 24px; color: #ff4d79;">You're officially my Valentine!</p>
         <img src="happy-cat-yippee-cat.gif" alt="happy cat">
       </div>
-      <canvas id="confetti"></canvas>
     `;
-    
-    // Start confetti animation
-    startConfetti();
   });
-  
-  function startConfetti() {
-    const canvas = document.getElementById('confetti');
-    const ctx = canvas.getContext('2d');
-    
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    canvas.style.position = 'fixed';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.style.pointerEvents = 'none';
-    canvas.style.zIndex = '9999';
-    
-    const confetti = [];
-    const confettiCount = 150;
-    const colors = ['#ff4d79', '#ff69b4', '#ff1493', '#ffc0cb', '#ff6b9d', '#c71585'];
-    
-    // Create confetti pieces
-    for (let i = 0; i < confettiCount; i++) {
-      confetti.push({
-        x: Math.random() * canvas.width,
-        y: Math.random() * canvas.height - canvas.height,
-        r: Math.random() * 6 + 4,
-        d: Math.random() * confettiCount,
-        color: colors[Math.floor(Math.random() * colors.length)],
-        tilt: Math.floor(Math.random() * 10) - 10,
-        tiltAngleIncremental: Math.random() * 0.07 + 0.05,
-        tiltAngle: 0
-      });
-    }
-    
-    function drawConfetti() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
-      for (let i = 0; i < confettiCount; i++) {
-        const c = confetti[i];
-        ctx.beginPath();
-        ctx.lineWidth = c.r / 2;
-        ctx.strokeStyle = c.color;
-        ctx.moveTo(c.x + c.tilt + c.r / 4, c.y);
-        ctx.lineTo(c.x + c.tilt, c.y + c.tilt + c.r / 4);
-        ctx.stroke();
-      }
-      
-      updateConfetti();
-      requestAnimationFrame(drawConfetti);
-    }
-    
-    function updateConfetti() {
-      for (let i = 0; i < confettiCount; i++) {
-        const c = confetti[i];
-        c.tiltAngle += c.tiltAngleIncremental;
-        c.y += (Math.cos(c.d) + 3 + c.r / 2) / 2;
-        c.tilt = Math.sin(c.tiltAngle - i / 3) * 15;
-        
-        if (c.y > canvas.height) {
-          confetti[i] = {
-            x: Math.random() * canvas.width,
-            y: -20,
-            r: c.r,
-            d: c.d,
-            color: c.color,
-            tilt: c.tilt,
-            tiltAngleIncremental: c.tiltAngleIncremental,
-            tiltAngle: c.tiltAngle
-          };
-        }
-      }
-    }
-    
-    drawConfetti();
-  }
   
   function sendNotification() {
     // Get current date and time in India timezone
