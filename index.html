@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Valentine 💖</title>
+  <style>
+    body {
+      height: 100vh;
+      margin: 0;
+      background: #ffe6ee;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      width: 90%;
+      max-width: 350px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    }
+    h1 {
+      color: #ff4d79;
+      margin-bottom: 20px;
+    }
+    .gif-container {
+      margin: 20px 0;
+      height: 150px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .gif-container img {
+      max-width: 150px;
+      max-height: 150px;
+      border-radius: 10px;
+    }
+    .buttons {
+      position: relative;
+      height: 140px;
+      margin-top: 20px;
+    }
+    button {
+      font-size: 20px;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+    #yes {
+      background: #ff4d79;
+      color: white;
+    }
+    #no {
+      background: #ccc;
+      color: #333;
+      position: absolute;
+      right: 0;
+    }
+    .success-screen {
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #ffe6ee;
+      padding: 20px;
+      text-align: center;
+    }
+    .success-screen h2 {
+      font-size: 30px;
+      color: #ff4d79;
+      margin-bottom: 20px;
+    }
+    .success-screen img {
+      max-width: 200px;
+      max-height: 200px;
+      margin: 20px 0;
+      border-radius: 15px;
+    }
+  </style>
+</head>
+<body>
+<!-- Welcome Page -->
+<div class="card" id="welcomePage">
+  <h1 style="font-size: 48px; margin-bottom: 30px;">Hi Mansi! 👋</h1>
+  <div class="gif-container">
+    <img src="shy-unsure.gif" alt="shy">
+  </div>
+  <p style="font-size: 20px; color: #ff4d79; margin: 20px 0;">I have something to ask you... 💕</p>
+  <button onclick="showQuestion()" style="background: #ff4d79; color: white; margin-top: 20px;">Continue 💖</button>
+</div>
+
+<!-- Question Page (hidden initially) -->
+<div class="card" id="questionPage" style="display: none;">
+  <h1>Will you be my Valentine? 💕</h1>
+  <div class="gif-container">
+    <img src="shy-unsure.gif" alt="shy">
+  </div>
+  <div class="buttons">
+    <button id="yes">Yes 💖</button>
+    <button id="no">No 💔</button>
+  </div>
+</div>
+
+<!-- EmailJS SDK -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script type="text/javascript">
+  // Initialize EmailJS with your Public Key
+  (function(){
+    emailjs.init("yk6fidhe1O-QKmIwB"); // Replace with your EmailJS public key
+  })();
+</script>
+
+<script>
+  // Function to show question page
+  function showQuestion() {
+    document.getElementById('welcomePage').style.display = 'none';
+    document.getElementById('questionPage').style.display = 'block';
+  }
+
+  const noBtn = document.getElementById("no");
+  const yesBtn = document.getElementById("yes");
+  const buttonsContainer = document.querySelector(".buttons");
+  let yesScale = 1;
+  let noScale = 1;
+  
+  function tease() {
+    // shrink NO
+    noScale -= 0.15;
+    if (noScale < 0.4) noScale = 0.4;
+    
+    // grow YES
+    yesScale += 0.2;
+    yesBtn.style.transform = `scale(${yesScale})`;
+    
+    // Get container bounds for keeping button inside
+    const containerRect = buttonsContainer.getBoundingClientRect();
+    const btnRect = noBtn.getBoundingClientRect();
+    
+    // Calculate random position within bounds
+    const maxX = containerRect.width - btnRect.width - 20;
+    const maxY = containerRect.height - btnRect.height - 20;
+    
+    const x = Math.random() * maxX;
+    const y = Math.random() * maxY;
+    
+    // Apply smooth transform
+    noBtn.style.transform = `translate(${x}px, ${y}px) scale(${noScale})`;
+  }
+  
+  // Use mouseenter for instant response
+  noBtn.addEventListener("mouseenter", tease);
+  noBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    tease();
+  });
+  
+  yesBtn.addEventListener("click", () => {
+    // Send email notification
+    sendNotification();
+    
+    // Show success screen
+    document.body.innerHTML = `
+      <div class="success-screen">
+        <h2>YAYYYY!!! 💖🥰</h2>
+        <p style="font-size: 24px; color: #ff4d79;">You're officially my Valentine!</p>
+        <img src="happy-cat-yippee-cat.gif" alt="happy cat">
+      </div>
+    `;
+  });
+  
+  function sendNotification() {
+    // Get current date and time in India timezone
+    const now = new Date();
+    const indiaTime = now.toLocaleString('en-IN', { 
+      timeZone: 'Asia/Kolkata',
+      dateStyle: 'full',
+      timeStyle: 'short'
+    });
+    
+    // Email parameters
+    const templateParams = {
+      to_email: 'ayushhubsdk@gmail.com', // Replace with your email
+      message: '🎉 SHE SAID YES! 💖 Your Valentine card got a YES response!',
+      timestamp: indiaTime
+    };
+    
+    // Send email via EmailJS
+    emailjs.send('service_veo9kqv', 'template_ooep4n6', templateParams)
+      .then(function(response) {
+        console.log('Notification sent!', response.status, response.text);
+      }, function(error) {
+        console.log('Failed to send notification', error);
+      });
+  }
+</script>
+</body>
+</html>
